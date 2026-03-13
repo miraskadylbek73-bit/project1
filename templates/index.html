@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>IQanat DocsIQ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --app-primary: #3d5a80;
+            --app-primary-soft: #5c7ca3;
+            --app-primary-bg: rgba(61, 90, 128, 0.08);
+            --app-success: #4a7c59;
+            --app-success-soft: rgba(74, 124, 89, 0.12);
+            --app-warning: #b8860b;
+            --app-warning-soft: rgba(184, 134, 11, 0.12);
+            --app-info: #4a6fa5;
+            --app-info-soft: rgba(74, 111, 165, 0.12);
+            --app-muted: #5c6b7a;
+            --app-border: #dde4ec;
+            --app-bg: #f4f6f9;
+            --app-card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            --app-card-shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+            --app-radius: 12px;
+            --app-radius-sm: 8px;
+        }
+        body { background: var(--app-bg); }
+        .content-area { background: var(--app-bg); }
+        .content-area h2 {
+            color: #2c3d52;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }          
+        .container.mt-5 .card {
+            border-radius: 16px;
+            box-shadow: var(--app-card-shadow-hover);
+            border: 1px solid var(--app-border);
+        }
+
+        .sidebar { 
+            height: 100vh; 
+            background: linear-gradient(180deg, #2d3d52 0%, #243447 100%);
+            color: rgba(255,255,255,0.95);
+            padding: 20px; 
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+        }
+        .sidebar h3 { color: #fff; font-weight: 600; }
+        .nav-link { 
+            color: rgba(255,255,255,0.85); 
+            margin-bottom: 6px; 
+            padding: 12px 16px;
+            border-radius: var(--app-radius-sm);
+            transition: background-color 0.2s, color 0.2s, transform 0.15s;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            transform: translateX(4px);
+        }
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        .content-area {
+            margin-left: 250px;
+            padding: 24px;
+        }
+        .content-section {
+            display: none;
+            animation: contentFade 0.25s ease;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes contentFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card-doc { 
+            border: 1px solid var(--app-border);
+            border-left: 4px solid var(--app-primary); 
+            margin-bottom: 12px;
+            border-radius: var(--app-radius);
+            box-shadow: var(--app-card-shadow);
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .card-doc:hover {
+            box-shadow: var(--app-card-shadow-hover);
+            border-left-color: var(--app-primary-soft);
+        }
+        .card {
+            border-radius: var(--app-radius);
+            border: 1px solid var(--app-border);
+            box-shadow: var(--app-card-shadow);
+        }
+        .card-body { padding: 1.25rem 1.5rem; }
+        .achievement-card {
+            border: 1px solid var(--app-border);
+            border-radius: var(--app-radius);
+            transition: transform 0.25s, box-shadow 0.25s;
+            height: 100%;
+            box-shadow: var(--app-card-shadow);
+        }
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--app-card-shadow-hover);
+        }
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .student-select-container {
+            position: relative;
+        }
+        .student-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .student-select-dropdown.show {
+            display: block;
+        }
+        .student-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .student-option:hover {
+            background-color: #f8f9fa;
+        }
+        .student-option:last-child {
+            border-bottom: none;
+        }
+        .student-option:hover {
+            background-color: var(--app-info-soft);
+        }
+        .alert {
+            border-radius: var(--app-radius);
+            border: 1px solid transparent;
+            padding: 1rem 1.25rem;
+        }
+        .alert-info {
+            background: var(--app-info-soft);
+            color: #2c3d52;
+            border-color: rgba(74, 111, 165, 0.25);
+        }
+        .alert-success {
+            background: var(--app-success-soft);
+            color: #2d4a36;
+            border-color: rgba(74, 124, 89, 0.3);
+        }
+        .alert-warning {
+            background: var(--app-warning-soft);
+            color: #5c4813;
+            border-color: rgba(184, 134, 11, 0.3);
+        }
+        .alert-danger {
+            background: rgba(180, 80, 70, 0.12);
+            color: #5c3029;
+            border-color: rgba(180, 80, 70, 0.25);
+        }
+        .btn {
+            border-radius: var(--app-radius-sm);
+            font-weight: 500;
+            transition: transform 0.15s, box-shadow 0.2s, background-color 0.2s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary {
+            background: var(--app-primary);
+            border-color: var(--app-primary);
+        }
+        .btn-primary:hover {
+            background: var(--app-primary-soft);
+            border-color: var(--app-primary-soft);
+            box-shadow: 0 4px 12px rgba(61, 90, 128, 0.35);
+        }
+        .btn-success {
+            background: var(--app-success);
+            border-color: var(--app-success);
+        }
+        .btn-success:hover {
+            background: #5a9068;
+            border-color: #5a9068;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.35);
+        }
+        .btn-outline-primary {
+            color: var(--app-primary);
+            border-color: var(--app-primary);
+        }
+        .btn-outline-primary:hover {
+            background: var(--app-primary-bg);
+            color: var(--app-primary-soft);
+            border-color: var(--app-primary-soft);
+        }
+        .btn-outline-secondary {
+            border-color: var(--app-border);
+            color: var(--app-muted);
+        }
+        .btn-outline-secondary:hover {
+            background: #e8ecf0;
+            border-color: #c5cdd8;
+            color: #4a5568;
+        }
+        .form-control, .form-select {
+            border-radius: var(--app-radius-sm);
+            border: 1px solid var(--app-border);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--app-primary-soft);
+            box-shadow: 0 0 0 3px var(--app-primary-bg);
+        }
+
+        .grade-table {
+            font-size: 0.95rem;
+            border-radius: var(--app-radius);
+            overflow: hidden;
+            box-shadow: var(--app-card-shadow);
+        }
+        .grade-table th {
+            background: var(--app-primary);
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 14px;
+        }
+        .grade-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .grade-excellent {
+            background: var(--app-success-soft);
+            color: #2d4a36;
+            font-weight: bold;
+        }
+        .grade-good {
+            background: var(--app-info-soft);
+            color: #2c3d52;
+        }
+        .grade-satisfactory {
+            background: var(--app-warning-soft);
+            color: #5c4813;
+        }
+        .modal-backdrop {
+            background: rgba(30, 45, 65, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-backdrop.show { opacity: 1; }
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, var(--app-primary) 0%, #2d4563 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border: none;
+        }
+        .modal-header .modal-title { font-weight: 600; }
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
+        .modal-body {
+            padding: 1.5rem 1.5rem;
+            background: #fff;
+        }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid var(--app-border);
+        }
+        .document-preview.bg-light {
+            background: var(--app-bg) !important;
+            border-radius: var(--app-radius);
+            border: 1px solid var(--app-border);
+        }
+        .bg-primary.bg-opacity-10 { background: var(--app-primary-bg) !important; }
+        .bg-success.bg-opacity-10 { background: var(--app-success-soft) !important; }
+        .bg-info.bg-opacity-10 { background: var(--app-info-soft) !important; }
+        .bg-warning.bg-opacity-10 { background: var(--app-warning-soft) !important; }
+        .bg-secondary.bg-opacity-10 { background: rgba(92, 107, 122, 0.12) !important; }
+        .bg-danger.bg-opacity-10 { background: rgba(166, 93, 85, 0.12) !important; }
+        .card.bg-light { background: #f0f3f6 !important; border-color: var(--app-border); }
+
+        .badge.bg-success { background: var(--app-success) !important; }
+        .badge.bg-primary { background: var(--app-primary) !important; }
+        .badge.bg-info { background: var(--app-info) !important; }
+        .badge.bg-warning { background: var(--app-warning) !important; color: #fff !important; }
+        .badge.bg-secondary { background: var(--app-muted) !important; }
+        .badge.bg-danger { background: #a65d55 !important; }
+        .badge { font-weight: 500; padding: 0.4em 0.75em; border-radius: 6px; }
+
+        .table {
+            border-radius: var(--app-radius);
+            overflow: hidden;
+        }
+        .table thead th {
+            background: #f0f3f6;
+            color: var(--app-primary);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--app-border);
+        }
+        .table tbody tr {
+            transition: background 0.15s;
+        }
+        .table tbody tr:hover {
+            background: var(--app-primary-bg);
+        }
+        .table-bordered { border-color: var(--app-border); }
+        .table-bordered th, .table-bordered td { border-color: var(--app-border); }
+
+        .medical-certificate {
+            border: 2px solid var(--app-border);
+            border-radius: var(--app-radius);
+            background: white;
+            padding: 30px;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: var(--app-card-shadow);
+            font-family: 'Times New Roman', serif;
+        }
+        .certificate-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .certificate-body {
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .certificate-signature {
+            text-align: center;
+            width: 45%;
+        }
+        .generate-report-btn {
+            font-size: 1.5rem;
+            padding: 20px 40px;
+            margin: 30px 0;
+        }
+        .cert-actions-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0 2rem;
+        }
+        .cert-action-btn {
+            min-height: 56px;
+            padding: 14px 28px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cert-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .cert-action-btn-issue {
+            background: linear-gradient(135deg, var(--app-primary) 0%, #2d4563 100%);
+            color: #fff;
+            border: none;
+        }
+        .cert-action-btn-issue:hover {
+            box-shadow: 0 6px 20px rgba(61, 90, 128, 0.4);
+        }
+        .cert-action-btn-view {
+            background: #fff;
+            color: var(--app-primary);
+            border: 2px solid var(--app-primary);
+        }
+        .cert-action-btn-view:hover {
+            background: var(--app-primary-bg);
+            color: var(--app-primary-soft);
+            border-color: var(--app-primary-soft);
+        }
+        .cert-form-card {
+            border: 1px solid var(--app-border);
+            border-radius: 16px;
+            box-shadow: var(--app-card-shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .cert-form-card .card-header {
+            background: linear-gradient(135deg, var(--app-primary) 0%, #2d4563 100%);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.2rem;
+            padding: 1rem 1.5rem;
+            border: none;
+        }
+        .cert-form-card .card-body {
+            padding: 1.75rem 1.5rem;
+        }
+        .cert-form-card .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .cert-form-card .form-control,
+        .cert-form-card .form-select {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .cert-signature-wrap {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .cert-form-card .btn-success {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .cert-form-card .btn-secondary {
+            padding: 12px 24px;
+            border-radius: 10px;
+        }
+        .cert-view-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+        .cert-view-card .card-header {
+            background: linear-gradient(135deg, var(--app-primary) 0%, #2d4563 100%);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.2rem;
+            padding: 1rem 1.5rem;
+            border: none;
+        }
+        .cert-table {
+            margin: 0;
+        }
+        .cert-table thead th {
+            background: #f0f3f6;
+            font-weight: 600;
+            color: var(--app-primary);
+            padding: 14px 16px;
+            border-bottom: 2px solid var(--app-border);
+        }
+        .cert-table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+        .cert-table tbody tr:hover {
+            background: var(--app-primary-bg);
+        }
+        .cert-table .badge {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+        /* Цифровая печать: штамп поверх документа */
+        .document-view { position: relative; }
+        .doc-seal-overlay {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 120px;
+            height: 120px;
+            pointer-events: none;
+        }
+        .doc-seal-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    {% if page == 'login' %}
+    <div class="container mt-5 text-center">
+        <h1 class="mb-4">DocsIQ</h1>
+        <div class="card p-4 mx-auto" style="max-width: 400px;">
+            <h3 class="mb-3">С возвращением!</h3>
+            <form action="/dashboard" method="post" id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Кто вы?</label>
+                    <select name="role" class="form-select" id="loginRole" onchange="toggleIINField()">
+                        <option value="student">Ученик</option>
+                        <option value="parent">Родитель</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="login" class="form-label">Логин</label>
+                    <input type="text" class="form-control" id="login" name="login" placeholder="Введите логин" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required>
+                </div>
+                <div class="mb-3" id="iinFieldBlock" style="display: none;">
+                    <label for="iin" class="form-label">ИИН (9 значный численный код)</label>
+                    <input type="text" class="form-control" id="iin" name="iin" placeholder="Введите 9 цифр ИИН" maxlength="9" pattern="[0-9]{9}" inputmode="numeric" autocomplete="off">
+                    <div class="form-text">Обязательно для входа в качестве Родителя или Администратора</div>
+                    <div class="invalid-feedback">Введите ровно 9 цифр ИИН</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Войти в систему</button>
+            </form>
+            <div class="mt-3" id="egovLinkBlock" style="display: none;">
+                <hr>
+                <p class="text-muted mb-2">или</p>
+                <a href="https://egov.kz" target="_blank" class="btn btn-outline-primary w-100">
+                    🔐 Войти через egov.kz
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleIINField() {
+            var role = document.getElementById('loginRole').value;
+            var block = document.getElementById('iinFieldBlock');
+            var input = document.getElementById('iin');
+            var egovLink = document.getElementById('egovLinkBlock');
+            if (role === 'parent' || role === 'admin') {
+                block.style.display = 'block';
+                input.required = true;
+                input.removeAttribute('disabled');
+                egovLink.style.display = 'block';
+            } else {
+                block.style.display = 'none';
+                input.required = false;
+                input.value = '';
+                input.setAttribute('disabled', 'disabled');
+                egovLink.style.display = 'none';
+            }
+        }
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            var role = document.getElementById('loginRole').value;
+            var iinInput = document.getElementById('iin');
+            if (role === 'parent' || role === 'admin') {
+                var val = iinInput.value.trim();
+                if (val.length !== 9 || !/^[0-9]{9}$/.test(val)) {
+                    e.preventDefault();
+                    iinInput.classList.add('is-invalid');
+                    iinInput.focus();
+                    return false;
+                }
+                iinInput.classList.remove('is-invalid');
+            }
+        });
+        document.getElementById('iin').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 9);
+            this.classList.remove('is-invalid');
+        });
+        toggleIINField();
+    </script>
+    {% else %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <h3>DocsIQ</h3>
+                <hr>
+                <p>Вы вошли как: <br><strong>{{ user.role }}</strong></p>
+                <nav class="nav flex-column mt-4">
+                    <a class="nav-link active" href="#" data-section="profile">👤 Мой профиль</a>
+                    {% if user.role != 'Родитель' %}
+                    <a class="nav-link" href="#" data-section="explanations">📝 Объяснительные</a>
+                    {% endif %}
+                    <a class="nav-link" href="#" data-section="applications">📄 Заявления</a>
+                    <a class="nav-link" href="#" data-section="reports">📊 Отчеты</a>
+                    <a class="nav-link" href="#" data-section="certificates">📋 Справки</a>
+                    <hr>
+                    <a class="nav-link" href="/">🚪 Выход</a>
+                </nav>
+            </div>
+            <div class="col-md-10 content-area">
+                <div id="profile" class="content-section active">
+                    {% if user.role == 'Ученик' %}
+                    <h2>Мой профиль</h2>
+                    <div class="alert alert-info">Информация о вашем профиле.</div>
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Добро пожаловать, {{ user.name }}!</h5>
+                            <p class="card-text">Роль: <strong>{{ user.role }}</strong></p>
+                            <p class="card-text">Это ваш рабочий кабинет для документооборота.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <h3>🏆 Достижения</h3>
+                        <div class="row mt-4">
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-warning bg-opacity-10">
+                                    <div class="achievement-icon">🥇</div>
+                                    <h5 class="card-title">1 место в олимпиаде</h5>
+                                    <p class="card-text text-muted">Математика, 2025</p>
+                                    <span class="badge bg-warning text-dark">Золото</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-secondary bg-opacity-10">
+                                    <div class="achievement-icon">🥈</div>
+                                    <h5 class="card-title">2 место в конкурсе</h5>
+                                    <p class="card-text text-muted">Физика, 2025</p>
+                                    <span class="badge bg-secondary">Серебро</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-danger bg-opacity-10">
+                                    <div class="achievement-icon">🥉</div>
+                                    <h5 class="card-title">3 место в турнире</h5>
+                                    <p class="card-text text-muted">Информатика, 2024</p>
+                                    <span class="badge bg-danger">Бронза</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-success bg-opacity-10">
+                                    <div class="achievement-icon">📜</div>
+                                    <h5 class="card-title">Грамота за отличную учебу</h5>
+                                    <p class="card-text text-muted">2024-2025 учебный год</p>
+                                    <span class="badge bg-success">Грамота</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-primary bg-opacity-10">
+                                    <div class="achievement-icon">🏆</div>
+                                    <h5 class="card-title">Кубок победителя</h5>
+                                    <p class="card-text text-muted">Школьная олимпиада, 2025</p>
+                                    <span class="badge bg-primary">Кубок</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card achievement-card text-center p-4 bg-info bg-opacity-10">
+                                    <div class="achievement-icon">📜</div>
+                                    <h5 class="card-title">Благодарственное письмо</h5>
+                                    <p class="card-text text-muted">За активное участие, 2025</p>
+                                    <span class="badge bg-info">Письмо</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Родитель' %}
+                    <h2>Профиль ребенка: Miras Kadylbek</h2>
+                    <div class="alert alert-info">Информация о профиле вашего ребенка.</div>
+                    
+                    <div class="mt-3 mb-4">
+                        <button class="btn btn-outline-primary" onclick="showPersonalInfo('parent')">
+                            📋 Личная информация
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="showChildProfile()" style="display: none;" id="backToChildProfileBtn">
+                            ← Назад к профилю ребенка
+                        </button>
+                    </div>
+                    
+                    <div id="childProfileInfo">
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Miras Kadylbek</h5>
+                                <p class="card-text"><strong>Роль:</strong> Ученик</p>
+                                <p class="card-text"><strong>Класс:</strong> 10А</p>
+                                <p class="card-text"><strong>Ментор:</strong>Ақбала ұстаз</p>
+                                <p class="card-text">Это рабочий кабинет вашего ребенка для документооборота.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="parentPersonalInfo" style="display: none;">
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Личная информация</h4>
+                                
+                                <div class="mb-4">
+                                    <h5>ФИО Родителя</h5>
+                                    <p class="fs-5"><strong>{{ user.name }}</strong></p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>ИИН (Индивидуальный идентификационный номер)</h5>
+                                    <p class="fs-5"><strong>850612345</strong></p>
+                                    <small class="text-muted">9-значный численный код</small>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>ЭЦП ключ</h5>
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <p class="mb-0"><strong>ecp_key_parent_850612345.p12</strong></p>
+                                                    <small class="text-muted">Формат файла: .p12 (PKCS#12)</small>
+                                                </div>
+                                                <button class="btn btn-primary btn-sm" onclick="downloadECPKey('parent')">
+                                                    📥 Скачать ЭЦП ключ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">Электронная цифровая подпись для подписания документов</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Администратор' %}
+                    <h2>Мой профиль</h2>
+                    <div class="alert alert-info">Информация о вашем профиле администратора.</div>
+                    
+                    <div class="mt-3 mb-4">
+                        <button class="btn btn-outline-primary" onclick="showPersonalInfo('admin')">
+                            📋 Личная информация
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="showAdminProfile()" style="display: none;" id="backToAdminProfileBtn">
+                            ← Назад к профилю
+                        </button>
+                    </div>
+                    
+                    <div id="adminProfileInfo">
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Добро пожаловать, {{ user.name }}!</h5>
+                                <p class="card-text">Роль: <strong>{{ user.role }}</strong></p>
+                                <p class="card-text">Это ваш рабочий кабинет для документооборота.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="adminPersonalInfo" style="display: none;">
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Личная информация</h4>
+                                
+                                <div class="mb-4">
+                                    <h5>ФИО Администратора</h5>
+                                    <p class="fs-5"><strong>{{ user.name }}</strong></p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>ИИН (Индивидуальный идентификационный номер)</h5>
+                                    <p class="fs-5"><strong>750423678</strong></p>
+                                    <small class="text-muted">9-значный численный код</small>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>ЭЦП ключ</h5>
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <p class="mb-0"><strong>ecp_key_admin_750423678.p12</strong></p>
+                                                    <small class="text-muted">Формат файла: .p12 (PKCS#12)</small>
+                                                </div>
+                                                <button class="btn btn-primary btn-sm" onclick="downloadECPKey('admin')">
+                                                    📥 Скачать ЭЦП ключ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">Электронная цифровая подпись для подписания документов</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5" id="studentSelectSection">
+                        <h3>Выбор ученика школы IQanat</h3>
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <div class="student-select-container">
+                                    <label for="studentSearch" class="form-label">Поиск ученика:</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="studentSearch" 
+                                           placeholder="Начните вводить имя ученика..."
+                                           autocomplete="off"
+                                           oninput="filterStudents(this.value)"
+                                           onfocus="showStudentDropdown()">
+                                    <div class="student-select-dropdown" id="studentDropdown">
+                                        <div class="student-option" onclick="selectStudent('Miras Kadylbek', '10А')">
+                                            <strong>Miras Kadylbek</strong> - Класс: 10А
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Айгерим', '10Б')">
+                                            <strong>Айгерим</strong> - Класс: 10Б
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Данияр', '11А')">
+                                            <strong>Данияр</strong> - Класс: 11А
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Алишер', '9А')">
+                                            <strong>Алишер</strong> - Класс: 9А
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Мадина', '10А')">
+                                            <strong>Мадина</strong> - Класс: 10А
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Ерлан', '11Б')">
+                                            <strong>Ерлан</strong> - Класс: 11Б
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Аружан', '9Б')">
+                                            <strong>Аружан</strong> - Класс: 9Б
+                                        </div>
+                                        <div class="student-option" onclick="selectStudent('Нурсултан', '10В')">
+                                            <strong>Нурсултан</strong> - Класс: 10В
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="selectedStudentInfo" class="mt-4" style="display: none;">
+                                    <div class="alert alert-success">
+                                        <h5>Выбранный ученик:</h5>
+                                        <p class="mb-0"><strong id="selectedStudentName"></strong> - Класс: <strong id="selectedStudentClass"></strong></p>
+                                    </div>
+
+                                    <div id="selectedStudentProfile" class="mt-4" style="display: none;">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title" id="profileStudentName">Имя ученика</h5>
+                                                <p class="card-text"><strong>Роль:</strong> Ученик</p>
+                                                <p class="card-text"><strong>Класс:</strong> <span id="profileStudentClass"></span></p>
+                                                <p class="card-text"><strong>Куратор:</strong> Айгуль Нурлановна</p>
+                                                <p class="card-text">Это профиль выбранного ученика.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <h5>🏆 Достижения</h5>
+                                            <div class="row mt-3">
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card achievement-card text-center p-3 bg-warning bg-opacity-10">
+                                                        <div class="achievement-icon">🥇</div>
+                                                        <h6 class="card-title">1 место в олимпиаде</h6>
+                                                        <p class="card-text text-muted small">Математика, 2025</p>
+                                                        <span class="badge bg-warning text-dark">Золото</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card achievement-card text-center p-3 bg-secondary bg-opacity-10">
+                                                        <div class="achievement-icon">🥈</div>
+                                                        <h6 class="card-title">2 место в конкурсе</h6>
+                                                        <p class="card-text text-muted small">Физика, 2025</p>
+                                                        <span class="badge bg-secondary">Серебро</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card achievement-card text-center p-3 bg-success bg-opacity-10">
+                                                        <div class="achievement-icon">📜</div>
+                                                        <h6 class="card-title">Грамота за отличную учебу</h6>
+                                                        <p class="card-text text-muted small">2024-2025 учебный год</p>
+                                                        <span class="badge bg-success">Грамота</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if user.role != 'Родитель' %}
+                <div id="explanations" class="content-section">
+                    <h2>Объяснительные</h2>
+                    
+                    {% if user.role == 'Ученик' %}
+                    <div class="alert alert-info">Раздел для работы с объяснительными записками.</div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary mb-4" onclick="showExplanationForm()">Написать объяснительную</button>
+                        
+                        <div id="explanationForm" style="display: none;">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Новая объяснительная записка</h5>
+                                    <form id="newExplanationForm">
+                                        <div class="mb-3">
+                                            <label for="reason" class="form-label">Причина</label>
+                                            <textarea class="form-control" id="reason" name="reason" rows="4" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="date" class="form-label">Дата</label>
+                                            <input type="date" class="form-control" id="date" name="date" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Отправить</button>
+                                        <button type="button" class="btn btn-secondary" onclick="hideExplanationForm()">Отмена</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">Ваши объяснительные:</h4>
+                        <div id="explanationsList" data-student-name="{{ user.name }}">
+                            <div class="card p-3 card-doc">
+                                <h5>Объяснительная записка</h5>
+                                <p>Дата: 15.02.2026</p>
+                                <p>Статус: <span class="badge bg-info">На рассмотрении</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Администратор' %}
+                    <div class="alert alert-info">Управление объяснительными записками.</div>
+                    <div class="mt-4">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ученик</th>
+                                    <th>Причина</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminExplanationsTable">
+                                <tr data-explanation-id="1">
+                                    <td>1</td>
+                                    <td>Miras Kadylbek</td>
+                                    <td>Опоздание на урок из-за кровотечения из носа</td>
+                                    <td>15.02.2026</td>
+                                    <td><span class="badge bg-warning text-dark">На рассмотрении</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveExplanation(1)">Подписать</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectExplanation(1)">Отклонить</button>
+                                    </td>
+                                </tr>
+                                <tr data-explanation-id="2">
+                                    <td>2</td>
+                                    <td>Айгерим</td>
+                                    <td>Пропуск урока по семейным обстоятельствам</td>
+                                    <td>18.02.2026</td>
+                                    <td><span class="badge bg-warning text-dark">На рассмотрении</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveExplanation(2)">Подписать</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectExplanation(2)">Отклонить</button>
+                                    </td>
+                                </tr>
+                                <tr data-explanation-id="3">
+                                    <td>3</td>
+                                    <td>Данияр</td>
+                                    <td>Не выполнил домашнее задание</td>
+                                    <td>19.02.2026</td>
+                                    <td><span class="badge bg-success">Подписано</span></td>
+                                    <td>
+                                        <span class="text-muted">-</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div id="applications" class="content-section">
+                    <h2>Заявления</h2>
+                    
+                    {% if user.role == 'Родитель' %}
+                    <div class="alert alert-info">Раздел для работы с заявлениями.</div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary mb-4" onclick="showApplicationForm()">Создать новое</button>
+                        
+                        <div id="applicationForm" style="display: none;">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Новое заявление</h5>
+                                    <form id="newApplicationForm">
+                                        <div class="mb-3">
+                                            <label for="applicationType" class="form-label">Тип заявления</label>
+                                            <select class="form-select" id="applicationType" name="applicationType" required>
+                                                <option value="">Выберите тип</option>
+                                                <option value="exemption">Освобождение от занятий</option>
+                                                <option value="transfer">Перевод в другой класс</option>
+                                                <option value="certificate">Запрос справки</option>
+                                                <option value="other">Другое</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="applicationText" class="form-label">Текст заявления</label>
+                                            <textarea class="form-control" id="applicationText" name="applicationText" rows="5" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="applicationDate" class="form-label">Дата</label>
+                                            <input type="date" class="form-control" id="applicationDate" name="applicationDate" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Отправить</button>
+                                        <button type="button" class="btn btn-secondary" onclick="hideApplicationForm()">Отмена</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">Ваши заявления:</h4>
+                        <div id="parentApplicationsList" data-parent-name="{{ user.name }}">
+                            <div class="card p-3 card-doc mb-3 app-doc" data-doc-type="Заявление на освобождение от занятий" data-doc-author="{{ user.name }}" data-doc-text="Прошу освободить моего ребенка от занятий с 10.02.2026 по 12.02.2026 по семейным обстоятельствам." data-doc-date="10.02.2026">
+                                <h5>Заявление на освобождение от занятий</h5>
+                                <p>Дата: 10.02.2026</p>
+                                <p>Статус: <span class="badge bg-warning text-dark">На подписи у Администратора</span></p>
+                                <div class="mt-2">
+                                    <button class="btn btn-outline-primary btn-sm view-doc-btn">Просмотреть</button>
+                                    <button class="btn btn-outline-success btn-sm sign-doc-btn">Подписать</button>
+                                </div>
+                            </div>
+                            <div class="card p-3 card-doc app-doc" data-doc-type="Запрос справки об обучении" data-doc-author="{{ user.name }}" data-doc-text="Прошу предоставить справку об обучении моего ребенка для предъявления по месту требования." data-doc-date="05.02.2026" data-doc-signature="">
+                                <h5>Запрос справки об обучении</h5>
+                                <p>Дата: 05.02.2026</p>
+                                <p>Статус: <span class="badge bg-success">Подписано</span></p>
+                                <div class="mt-2">
+                                    <button class="btn btn-outline-primary btn-sm view-doc-btn">Просмотреть</button>
+                                    <button class="btn btn-outline-success btn-sm sign-doc-btn">Подписать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Ученик' %}
+                    <div class="alert alert-info">Раздел для просмотра ваших заявлений.</div>
+                    <div class="mt-4">
+                        <h4>Ваши заявления:</h4>
+                        <div id="studentApplicationsList">
+                            <div class="card p-3 card-doc mb-3 app-doc" data-doc-type="Заявление на освобождение от занятий" data-doc-author="{{ user.name }}" data-doc-text="Прошу освободить меня от занятий 12.02.2026 по уважительной причине." data-doc-date="12.02.2026">
+                                <h5>Заявление на освобождение от занятий</h5>
+                                <p>Дата: 12.02.2026</p>
+                                <p>Статус: <span class="badge bg-info">На рассмотрении</span></p>
+                                <div class="mt-2"><button class="btn btn-outline-primary btn-sm view-doc-btn">Просмотреть</button></div>
+                            </div>
+                            <div class="card p-3 card-doc app-doc" data-doc-type="Заявление о переводе" data-doc-author="{{ user.name }}" data-doc-text="Прошу перевести меня в другой класс в связи с переездом." data-doc-date="08.02.2026">
+                                <h5>Заявление о переводе</h5>
+                                <p>Дата: 08.02.2026</p>
+                                <p>Статус: <span class="badge bg-warning text-dark">На подписи у Администратора</span></p>
+                                <div class="mt-2"><button class="btn btn-outline-primary btn-sm view-doc-btn">Просмотреть</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Администратор' %}
+                    <div class="alert alert-info">Управление заявлениями. Вы можете создавать заявления от имени школы, подписывать и удалять заявления.</div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary mb-4" onclick="showAdminApplicationForm()">Создать новое от имени школы</button>
+                        
+                        <div id="adminApplicationForm" style="display: none;">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Новое заявление от имени школы</h5>
+                                    <form id="newAdminApplicationForm">
+                                        <div class="mb-3">
+                                            <label for="adminApplicationType" class="form-label">Тип заявления</label>
+                                            <select class="form-select" id="adminApplicationType" name="adminApplicationType" required>
+                                                <option value="">Выберите тип</option>
+                                                <option value="official">Официальное уведомление</option>
+                                                <option value="event">Уведомление о мероприятии</option>
+                                                <option value="schedule">Изменение расписания</option>
+                                                <option value="other">Другое</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="adminApplicationText" class="form-label">Текст заявления</label>
+                                            <textarea class="form-control" id="adminApplicationText" name="adminApplicationText" rows="5" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="adminApplicationDate" class="form-label">Дата</label>
+                                            <input type="date" class="form-control" id="adminApplicationDate" name="adminApplicationDate" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Создать</button>
+                                        <button type="button" class="btn btn-secondary" onclick="hideAdminApplicationForm()">Отмена</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">Все заявления:</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Автор</th>
+                                        <th>Тип</th>
+                                        <th>Текст</th>
+                                        <th>Дата</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminApplicationsTable">
+                                    <tr data-application-id="1" class="app-doc" data-doc-type="Освобождение от занятий" data-doc-author="Серик Болатович (Родитель)" data-doc-text="Прошу освободить моего ребенка от занятий с 10.02.2026 по 12.02.2026 по семейным обстоятельствам." data-doc-date="10.02.2026">
+                                        <td>1</td>
+                                        <td>Серик Болатович (Родитель)</td>
+                                        <td>Освобождение от занятий</td>
+                                        <td>Прошу освободить моего ребенка от занятий...</td>
+                                        <td>10.02.2026</td>
+                                        <td><span class="badge bg-warning text-dark">На подписи</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                            <button class="btn btn-success btn-sm" onclick="openSignModal(1, 'admin')">Подписать</button>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteApplication(1)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-application-id="2" class="app-doc" data-doc-type="Перевод в другой класс" data-doc-author="Мирас (Ученик)" data-doc-text="Прошу перевести меня в другой класс в связи с переездом семьи." data-doc-date="08.02.2026">
+                                        <td>2</td>
+                                        <td>Мирас (Ученик)</td>
+                                        <td>Перевод в другой класс</td>
+                                        <td>Прошу перевести меня в класс...</td>
+                                        <td>08.02.2026</td>
+                                        <td><span class="badge bg-warning text-dark">На подписи</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                            <button class="btn btn-success btn-sm" onclick="openSignModal(2, 'admin')">Подписать</button>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteApplication(2)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-application-id="3" class="app-doc" data-doc-type="Официальное уведомление" data-doc-author="Школа (Администратор)" data-doc-text="Уведомляем о проведении родительского собрания 20.02.2026 в 18:00 в актовом зале школы." data-doc-date="15.02.2026" data-doc-signature="">
+                                        <td>3</td>
+                                        <td>Школа (Администратор)</td>
+                                        <td>Официальное уведомление</td>
+                                        <td>Уведомляем о проведении родительского собрания...</td>
+                                        <td>15.02.2026</td>
+                                        <td><span class="badge bg-success">Подписано</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteApplication(3)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-application-id="4" class="app-doc" data-doc-type="Запрос справки" data-doc-author="Серик Болатович (Родитель)" data-doc-text="Прошу предоставить справку об обучении моего ребенка для предъявления по месту требования." data-doc-date="05.02.2026" data-doc-signature="">
+                                        <td>4</td>
+                                        <td>Серик Болатович (Родитель)</td>
+                                        <td>Запрос справки</td>
+                                        <td>Прошу предоставить справку об обучении...</td>
+                                        <td>05.02.2026</td>
+                                        <td><span class="badge bg-success">Подписано</span></td>
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteApplication(4)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="reports" class="content-section">
+                    <h2>Отчеты</h2>
+                    
+                    {% if user.role == 'Ученик' or user.role == 'Родитель' %}
+                    <div class="alert alert-info">Таблица успеваемости {% if user.role == 'Родитель' %}ребенка (Мирас){% endif %}.</div>
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                            <h4 class="mb-0">Успеваемость за 2 четверть 2025-2026 учебного года</h4>
+                            {% if user.role == 'Родитель' %}
+                            <button type="button" class="btn btn-outline-primary" onclick="runAIAnalysis('gradesTable')">
+                                🤖 Анализ ИИ
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div id="aiAnalysisGradesBlock" class="alert alert-info mb-3" style="display: none;">
+                            <strong>Краткая суть отчёта:</strong>
+                            <p id="aiAnalysisGradesResult" class="mb-0 mt-2"></p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover grade-table" id="gradesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Предмет</th>
+                                        <th>Учитель</th>
+                                        <th>1</th>
+                                        <th>2</th>
+                                        <th>3</th>
+                                        <th>4</th>
+                                        <th>5</th>
+                                        <th>6</th>
+                                        <th>7</th>
+                                        <th>8</th>
+                                        <th>Средний балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Математика</strong></td>
+                                        <td>Динара ұстаз</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">4.75</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Физика</strong></td>
+                                        <td>Алмас ұстаз</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td><strong class="text-info">4.38</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Химия</strong></td>
+                                        <td>Ақбала ұстаз</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">4.88</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Биология</strong></td>
+                                        <td>Адильбек ұстаз</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td><strong class="text-info">4.25</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>История Казахстана</strong></td>
+                                        <td>Азамат ұстаз</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Английский язык</strong></td>
+                                        <td>Айгерим ұстаз</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td><strong class="text-info">4.25</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Казахский язык</strong></td>
+                                        <td>Жанар ұстаз</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Информатика</strong></td>
+                                        <td>Алмас ұстаз</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-info">
+                                        <td colspan="10" class="text-end"><strong>Общий средний балл:</strong></td>
+                                        <td><strong class="text-primary" style="font-size: 1.2rem;">4.69</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-5">
+                            <button class="btn btn-outline-primary btn-lg" onclick="toggleAnnualReport()">
+                                📋 Открыть табель годовых оценок
+                            </button>
+                            
+                            <div id="annualReportTable" style="display: none;" class="mt-4">
+                                <h4 class="mb-3">Табель годовых оценок за 9 классов</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover grade-table">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">Предмет</th>
+                                                <th colspan="9">Класс</th>
+                                                <th rowspan="2">Средний балл</th>
+                                            </tr>
+                                            <tr>
+                                                <th>1</th>
+                                                <th>2</th>
+                                                <th>3</th>
+                                                <th>4</th>
+                                                <th>5</th>
+                                                <th>6</th>
+                                                <th>7</th>
+                                                <th>8</th>
+                                                <th>9</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Математика</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">4.78</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Физика</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td><strong class="text-info">4.40</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Химия</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Биология</strong></td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td><strong class="text-info">4.44</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>История Казахстана</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Всемирная история</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td><strong class="text-info">4.67</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Английский язык</strong></td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td><strong class="text-info">4.44</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Казахский язык</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Русский язык</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Литература</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">4.78</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Информатика</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>География</strong></td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-good">4</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-info">4.80</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Физическая культура</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Изобразительное искусство</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Музыка</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Трудовое обучение</strong></td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td class="grade-excellent">5</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td><strong class="text-success">5.00</strong></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-info">
+                                                <td colspan="10" class="text-end"><strong>Общий средний балл за все годы:</strong></td>
+                                                <td><strong class="text-primary" style="font-size: 1.2rem;">4.85</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Администратор' %}
+                    <div class="alert alert-info">Управление отчетами по успеваемости.</div>
+
+                    <div class="row mt-4 mb-4">
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header" style="background: var(--app-primary); color: #fff; font-weight: 600;">Типы документов</div>
+                                <div class="card-body">
+                                    <div class="position-relative" style="height: 280px;">
+                                        <canvas id="adminChartDocuments"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header" style="background: var(--app-primary); color: #fff; font-weight: 600;">Успеваемость ученика (средний балл по четвертям)</div>
+                                <div class="card-body">
+                                    <div class="position-relative" style="height: 280px;">
+                                        <canvas id="adminChartGrades"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <button class="btn btn-primary btn-lg w-100" style="padding: 20px;" onclick="showUploadReportForm()">
+                                    📤 Загрузить отчёт
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <button class="btn btn-success btn-lg w-100" style="padding: 20px;" onclick="showSubmittedReports()">
+                                    📋 Сданные отчёты
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="uploadReportForm" style="display: none;" class="mt-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Загрузка отчета</h5>
+                                <form id="reportUploadForm" onsubmit="handleReportUpload(event)">
+                                    <div class="mb-3">
+                                        <label for="reportFile" class="form-label">Выберите файл отчета (формат .xlsx)</label>
+                                        <input type="file" class="form-control" id="reportFile" name="reportFile" accept=".xlsx" required>
+                                        <div class="form-text">Поддерживается только формат Microsoft Excel (.xlsx)</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reportName" class="form-label">Название отчета</label>
+                                        <input type="text" class="form-control" id="reportName" name="reportName" placeholder="Например: Отчет за 1 четверть 2025-2026" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Загрузить</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideUploadReportForm()">Отмена</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="submittedReportsSection" style="display: none;" class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <h4 class="mb-0">Сданные отчёты</h4>
+                            <div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="runAIAnalysis('submittedReportsTable')">🤖 Анализ ИИ</button>
+                                <button class="btn btn-secondary btn-sm" onclick="hideSubmittedReports()">Закрыть</button>
+                            </div>
+                        </div>
+                        <div id="aiAnalysisBlock" class="alert alert-info" style="display: none;">
+                            <strong>Краткая суть отчёта:</strong>
+                            <p id="aiAnalysisResult" class="mb-0 mt-2"></p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="submittedReportsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Класс</th>
+                                        <th>Ученик</th>
+                                        <th>Математика</th>
+                                        <th>Физика</th>
+                                        <th>Химия</th>
+                                        <th>Биология</th>
+                                        <th>История</th>
+                                        <th>Английский</th>
+                                        <th>Казахский</th>
+                                        <th>Информатика</th>
+                                        <th>Средний балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>10А</strong></td>
+                                        <td>Miras Kadylbek</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">4.67</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>10А</strong></td>
+                                        <td>Мадина</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>10Б</strong></td>
+                                        <td>Айгерим</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td><strong class="text-info">4.50</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>11А</strong></td>
+                                        <td>Данияр</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">4.78</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>9А</strong></td>
+                                        <td>Алишер</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-info">4.56</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>9Б</strong></td>
+                                        <td>Аружан</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>11Б</strong></td>
+                                        <td>Ерлан</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-good">4</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-info">4.44</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>10В</strong></td>
+                                        <td>Нурсултан</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td class="grade-excellent">5</td>
+                                        <td><strong class="text-success">5.00</strong></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-info">
+                                        <td colspan="10" class="text-end"><strong>Общий средний балл по всем классам:</strong></td>
+                                        <td><strong class="text-primary" style="font-size: 1.2rem;">4.74</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="certificates" class="content-section">
+                    <h2>Справки</h2>
+                    
+                    {% if user.role == 'Ученик' %}
+                    <div class="alert alert-info">Раздел для просмотра медицинских справок.</div>
+                    <div class="mt-4">
+                        <h4>Медицинские справки:</h4>
+                        
+                        <div class="medical-certificate">
+                            <div class="certificate-header">
+                                <h3 style="margin: 0; font-weight: bold;">МЕДИЦИНСКАЯ СПРАВКА</h3>
+                                <p style="margin: 5px 0; font-size: 0.9rem;">№ 12345 от 15.02.2026</p>
+                            </div>
+                            
+                            <div class="certificate-body">
+                                <p style="text-indent: 30px; margin-bottom: 15px;">
+                                    Настоящая справка выдана <strong>Мирасу</strong>, учащемуся школы IQanat, 
+                                    класс 10А, в том, что он находился на амбулаторном лечении 
+                                    с 10.02.2026 по 14.02.2026.
+                                </p>
+                                
+                                <p style="text-indent: 30px; margin-bottom: 15px;">
+                                    Диагноз: ОРВИ (острая респираторная вирусная инфекция).
+                                </p>
+                                
+                                <p style="text-indent: 30px; margin-bottom: 15px;">
+                                    Рекомендации: щадящий режим, освобождение от физических нагрузок 
+                                    на 3 дня.
+                                </p>
+                                
+                                <p style="text-indent: 30px; margin-bottom: 15px;">
+                                    Справка действительна до: 20.02.2026
+                                </p>
+                            </div>
+                            
+                            <div class="certificate-footer">
+                                <div class="certificate-signature">
+                                    <p style="margin-bottom: 50px;">Врач</p>
+                                    <p style="border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 200px;">
+                                        <strong>А.С. Нурланова</strong>
+                                    </p>
+                                    <p style="font-size: 0.85rem; margin-top: 5px;">Подпись</p>
+                                </div>
+                                <div class="certificate-signature">
+                                    <p style="margin-bottom: 50px;">Главный врач</p>
+                                    <p style="border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 200px;">
+                                        <strong>Б.К. Алиев</strong>
+                                    </p>
+                                    <p style="font-size: 0.85rem; margin-top: 5px;">Подпись</p>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+                                <p style="font-size: 0.8rem; color: #666;">
+                                    Лицензия: ЛО-12345 от 01.01.2020
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary" onclick="downloadCertificate()">📥 Скачать справку</button>
+                            <button class="btn btn-secondary" onclick="printCertificate()">🖨️ Печать</button>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Родитель' %}  
+                    <div class="alert alert-info">Раздел для работы со справками ребенка.</div>
+                    <div class="mt-4">
+                        <h4>Справки ребенка (Miras Kadylbek):</h4>
+                        <div class="card p-3 card-doc">
+                            <h5>Справка об обучении</h5>
+                            <p>Дата запроса: 10.02.2026</p>
+                            <p>Статус: <span class="badge bg-success">Готова</span></p>
+                        </div>
+                        <div class="card p-3 card-doc mt-3">
+                            <h5>Медицинская справка</h5>
+                            <p>Дата выдачи: 15.02.2026</p>
+                            <p>Статус: <span class="badge bg-success">Действительна</span></p>
+                        </div>
+                    </div>
+                    
+                    {% elif user.role == 'Администратор' %}
+                    <div class="alert alert-info mb-0">Управление справками.</div>
+                    <div class="cert-actions-row">
+                        <button type="button" class="cert-action-btn cert-action-btn-issue" onclick="showIssueCertificateForm()">📄 Выдать справку</button>
+                        <button type="button" class="cert-action-btn cert-action-btn-view" onclick="toggleViewCertificates()">📋 Просмотреть справки</button>
+                    </div>
+                    <div id="issueCertificateForm" style="display: none;" class="card cert-form-card">
+                        <div class="card-header">Выдача справки</div>
+                        <div class="card-body">
+                            <form id="newCertificateForm" onsubmit="handleIssueCertificate(event)">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="certStudent" class="form-label">Ученик</label>
+                                        <select id="certStudent" class="form-select form-select-lg" required>
+                                            <option value="">— Выберите ученика —</option>
+                                            <option value="Miras Kadylbek">Miras Kadylbek — 10А</option>
+                                            <option value="Айгерим">Айгерим — 10Б</option>
+                                            <option value="Данияр">Данияр — 11А</option>
+                                            <option value="Алишер">Алишер — 9А</option>
+                                            <option value="Мадина">Мадина — 10А</option>
+                                            <option value="Ерлан">Ерлан — 11Б</option>
+                                            <option value="Аружан">Аружан — 9Б</option>
+                                            <option value="Нурсултан">Нурсултан — 10В</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="certDate" class="form-label">Дата</label>
+                                        <input type="date" id="certDate" class="form-control form-control-lg" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="certReason" class="form-label">Причина / тип справки</label>
+                                        <select id="certReason" class="form-select form-select-lg" required>
+                                            <option value="">— Выберите причину —</option>
+                                            <option value="об обучении">Справка об обучении</option>
+                                            <option value="медицинская">Медицинская справка</option>
+                                            <option value="в бассейн">Справка в бассейн</option>
+                                            <option value="для соревнований">Для соревнований</option>
+                                            <option value="другое">Другое</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Подпись</label>
+                                        <div class="cert-signature-wrap">
+                                            <canvas id="certSignaturePad" width="500" height="120" style="width: 100%; height: 120px; touch-action: none;"></canvas>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="clearCertSignature()">Очистить подпись</button>
+                                    </div>
+                                    <div class="col-12 d-flex gap-3 pt-2">
+                                        <button type="submit" class="btn btn-success">Выдать справку</button>
+                                        <button type="button" class="btn btn-secondary" onclick="hideIssueCertificateForm()">Отмена</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="viewCertificatesBlock" style="display: none;" class="card cert-view-card">
+                        <div class="card-header">Все справки (входящие и выданные)</div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table cert-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Ученик</th>
+                                            <th>Причина / тип</th>
+                                            <th>Дата</th>
+                                            <th>Статус</th>
+                                            <th>Подпись</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="allCertificatesList">
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Miras Kadylbek</td>
+                                            <td>Справка об обучении</td>
+                                            <td>10.02.2026</td>
+                                            <td><span class="badge bg-success">Выдана</span></td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="modal fade" id="viewDocModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Заявление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="document-view">
+                        <div class="border-bottom pb-3 mb-3">
+                            <h4 id="viewDocType"></h4>
+                            <p class="mb-0"><strong>Автор:</strong> <span id="viewDocAuthor"></span></p>
+                            <p class="mb-0"><strong>Дата:</strong> <span id="viewDocDate"></span></p>
+                        </div>
+                        <div class="mb-4">
+                            <strong>Текст заявления:</strong>
+                            <p id="viewDocText" class="mt-2" style="white-space: pre-wrap;"></p>
+                        </div>
+                        <div id="viewDocSignatureBlock" style="display: none;" class="mt-4 pt-3 border-top">
+                            <strong>Подпись:</strong>
+                            <div class="mt-2"><img id="viewDocSignatureImg" src="" alt="Подпись" style="max-width: 300px; max-height: 80px;"></div>
+                        </div>
+                        <div id="viewDocSealBlock" class="doc-seal-overlay" style="display: none;">
+                            <img id="viewDocSealImg" src="" alt="Печать">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="signDocModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Подписание заявления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="document-preview mb-4 p-3 bg-light rounded">
+                        <h6 id="signDocType"></h6>
+                        <p class="mb-0 small"><strong>Автор:</strong> <span id="signDocAuthor"></span> | <strong>Дата:</strong> <span id="signDocDate"></span></p>
+                        <p id="signDocText" class="mt-2 small" style="white-space: pre-wrap;"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Цифровая печать</strong></label>
+                        <p class="small text-muted mb-2">Снимок с веб-камеры будет преобразован в печать с синим оттенком и текстом «IQanat Verified».</p>
+                        <div class="d-flex align-items-start gap-3 flex-wrap">
+                            <div>
+                                <video id="sealVideo" autoplay playsinline muted width="160" height="120" class="rounded border" style="background: #000; transform: scaleX(-1);"></video>
+                                <div class="mt-1">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="captureSealBtn">Сделать снимок для печати</button>
+                                </div>
+                            </div>
+                            <div id="sealPreviewWrap" style="display: none;">
+                                <span class="small text-muted d-block mb-1">Предпросмотр печати:</span>
+                                <canvas id="sealPreview" width="120" height="120" style="border-radius: 50%; display: block;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Рукописная подпись:</strong></label>
+                        <div class="border rounded" style="background: #fff;">
+                            <canvas id="signaturePad" width="600" height="150" style="width: 100%; height: 150px; touch-action: none;"></canvas>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-1" id="clearSignatureBtn">Очистить</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-success" id="confirmSignBtn">Подтвердить подпись</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>    
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    const targetSection = document.getElementById(this.getAttribute('data-section'));
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+            
+            const explanationForm = document.getElementById('newExplanationForm');
+            if (explanationForm) {
+                explanationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const reason = document.getElementById('reason').value;
+                    const date = document.getElementById('date').value;
+                    
+                    const explanationsList = document.getElementById('explanationsList');
+                    if (explanationsList) {
+                        const newCard = document.createElement('div');
+                        newCard.className = 'card p-3 card-doc';
+                        newCard.style.marginTop = '10px';
+                        newCard.innerHTML = `
+                            <h5>Объяснительная записка</h5>
+                            <p><strong>Причина:</strong> ${reason}</p>
+                            <p>Дата: ${date}</p>
+                            <p>Статус: <span class="badge bg-info">На рассмотрении</span></p>
+                        `;
+                        explanationsList.appendChild(newCard);
+                    }
+                    
+                    const adminTable = document.getElementById('adminExplanationsTable');
+                    if (adminTable) {
+                        const rowCount = adminTable.rows.length;
+                        const newRow = adminTable.insertRow();
+                        const explanationsList = document.getElementById('explanationsList');
+                        const studentName = explanationsList ? explanationsList.getAttribute('data-student-name') || 'Ученик' : 'Ученик';
+                        const newId = Date.now(); 
+                        newRow.setAttribute('data-explanation-id', newId);
+                        newRow.innerHTML = `
+                            <td>${rowCount + 1}</td>
+                            <td>${studentName}</td>
+                            <td>${reason.length > 50 ? reason.substring(0, 50) + '...' : reason}</td>
+                            <td>${date}</td>
+                            <td><span class="badge bg-warning text-dark">На рассмотрении</span></td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="approveExplanation(${newId})">Подписать</button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectExplanation(${newId})">Отклонить</button>
+                            </td>
+                        `;
+                    }
+                    
+                    alert('Объяснительная отправлена на рассмотрение!\nПричина: ' + reason + '\nДата: ' + date);
+                    
+                    explanationForm.reset();
+                    hideExplanationForm();
+                });
+            }
+            initAdminCharts();
+        });
+        
+        function showExplanationForm() {
+            document.getElementById('explanationForm').style.display = 'block';
+        }
+        
+        function hideExplanationForm() {
+            document.getElementById('explanationForm').style.display = 'none';
+        }
+        
+        function approveExplanation(id) {
+            if (confirm('Вы уверены, что хотите подписать эту объяснительную?')) {
+                const table = document.getElementById('adminExplanationsTable');
+                if (table) {
+                    const row = table.querySelector(`tr[data-explanation-id="${id}"]`);
+                    if (row) {
+                        const statusCell = row.cells[4];
+                        statusCell.innerHTML = '<span class="badge bg-success">Подписано</span>';
+                        
+                        const actionsCell = row.cells[5];
+                        actionsCell.innerHTML = '<span class="text-muted">-</span>';
+                        
+                        alert('Объяснительная подписана');
+                        return;
+                    }
+                }
+                alert('Объяснительная #' + id + ' подписана');
+            }
+        }
+        
+        function rejectExplanation(id) {
+            if (confirm('Вы уверены, что хотите отклонить эту объяснительную?')) {
+                const table = document.getElementById('adminExplanationsTable');
+                if (table) {
+                    const row = table.querySelector(`tr[data-explanation-id="${id}"]`);
+                    if (row) {
+                        row.remove();
+                        alert('Объяснительная отклонена и удалена');
+                        return;
+                    }
+                }
+                alert('Объяснительная #' + id + ' отклонена');
+            }
+        }
+        
+        function showUploadReportForm() {
+            document.getElementById('uploadReportForm').style.display = 'block';
+            document.getElementById('submittedReportsSection').style.display = 'none';
+        }
+        
+        function hideUploadReportForm() {
+            document.getElementById('uploadReportForm').style.display = 'none';
+        }
+        
+        function showSubmittedReports() {
+            document.getElementById('submittedReportsSection').style.display = 'block';
+            document.getElementById('uploadReportForm').style.display = 'none';
+        }
+        
+        function hideSubmittedReports() {
+            document.getElementById('submittedReportsSection').style.display = 'none';
+        }
+
+        function initAdminCharts() {
+            var docCanvas = document.getElementById('adminChartDocuments');
+            var gradesCanvas = document.getElementById('adminChartGrades');
+            if (!docCanvas || typeof Chart === 'undefined') return;
+
+            if (docCanvas) {
+                new Chart(docCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Заявления', 'Справки'],
+                        datasets: [{
+                            data: [18, 12],
+                            backgroundColor: ['#3d5a80', '#4a7c59'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+            if (gradesCanvas) {
+                new Chart(gradesCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['1 четверть', '2 четверть', '3 четверть', '4 четверть'],
+                        datasets: [{
+                            label: 'Средний балл',
+                            data: [4.52, 4.69, 4.71, 4.78],
+                            borderColor: '#3d5a80',
+                            backgroundColor: 'rgba(61, 90, 128, 0.1)',
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 3,
+                                max: 5,
+                                ticks: { stepSize: 0.5 }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+
+        let certSignaturePad = null;
+        function showIssueCertificateForm() {
+            var form = document.getElementById('issueCertificateForm');
+            var viewBlock = document.getElementById('viewCertificatesBlock');
+            if (form) form.style.display = 'block';
+            if (viewBlock) viewBlock.style.display = 'none';
+            var dateEl = document.getElementById('certDate');
+            if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+            setTimeout(function() {
+                var canvas = document.getElementById('certSignaturePad');
+                if (canvas) {
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = 120;
+                    if (certSignaturePad) certSignaturePad.clear();
+                    else certSignaturePad = new SignaturePad(canvas, { penColor: '#000', backgroundColor: '#fff' });
+                    certSignaturePad.clear();
+                }
+            }, 200);
+        }
+        function hideIssueCertificateForm() {
+            var form = document.getElementById('issueCertificateForm');
+            if (form) form.style.display = 'none';
+        }
+        function clearCertSignature() {
+            if (certSignaturePad) certSignaturePad.clear();
+        }
+        function toggleViewCertificates() {
+            var block = document.getElementById('viewCertificatesBlock');
+            var form = document.getElementById('issueCertificateForm');
+            if (block) block.style.display = block.style.display === 'none' ? 'block' : 'none';
+            if (form) form.style.display = 'none';
+        }
+        function handleIssueCertificate(e) {
+            e.preventDefault();
+            if (!certSignaturePad || certSignaturePad.isEmpty()) {
+                alert('Пожалуйста, поставьте подпись.');
+                return;
+            }
+            var studentEl = document.getElementById('certStudent');
+            var studentText = studentEl.options[studentEl.selectedIndex].text;
+            var studentName = studentText.split('—')[0].trim();
+            var date = document.getElementById('certDate').value;
+            var reasonEl = document.getElementById('certReason');
+            var reason = reasonEl.options[reasonEl.selectedIndex].text;
+            var sigData = certSignaturePad.toDataURL('image/png');
+            var tbody = document.getElementById('allCertificatesList');
+            if (!tbody) return;
+            var num = tbody.rows.length + 1;
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + num + '</td><td>' + studentName + '</td><td>' + reason + '</td><td>' + date + '</td><td><span class="badge bg-success">Выдана</span></td><td><img src="' + sigData + '" alt="Подпись" style="max-width:80px;max-height:30px;"></td>';
+            tbody.appendChild(tr);
+            document.getElementById('newCertificateForm').reset();
+            certSignaturePad.clear();
+            hideIssueCertificateForm();
+            alert('Справка успешно выдана.');
+        }
+
+        function extractTableData(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return '';
+            const rows = [];
+            const trs = table.querySelectorAll('tbody tr, tfoot tr');
+            trs.forEach(tr => {
+                const cells = tr.querySelectorAll('td');
+                const rowText = Array.from(cells).map(td => td.textContent.trim()).join(' | ');
+                if (rowText) rows.push(rowText);
+            });
+            return rows.join('\n');
+        }
+
+        function runAIAnalysis(tableId) {
+            const data = extractTableData(tableId);
+            if (!data) {
+                alert('Нет данных для анализа');
+                return;
+            }
+            const resultEl = tableId === 'gradesTable' ? document.getElementById('aiAnalysisGradesResult') : document.getElementById('aiAnalysisResult');
+            const blockEl = tableId === 'gradesTable' ? document.getElementById('aiAnalysisGradesBlock') : document.getElementById('aiAnalysisBlock');
+            if (!resultEl || !blockEl) return;
+            resultEl.textContent = 'Анализ...';
+            blockEl.style.display = 'block';
+            setTimeout(function() {
+                let summary = '';
+                if (tableId === 'gradesTable') {
+                    const lines = data.split('\n');
+                    const subjects = [];
+                    let totalAvg = 0;
+                    let count = 0;
+                    lines.forEach(line => {
+                        const parts = line.split('|');
+                        if (parts.length >= 2) {
+                            const subj = parts[0].replace(/\*\*/g, '').trim();
+                            const lastPart = parts[parts.length - 1].trim();
+                            const avgMatch = lastPart.match(/[\d.,]+/);
+                            if (avgMatch && !line.includes('Общий средний')) {
+                                subjects.push({ name: subj, avg: parseFloat(avgMatch[0].replace(',', '.')) });
+                                totalAvg += parseFloat(avgMatch[0].replace(',', '.'));
+                                count++;
+                            }
+                        }
+                    });
+                    const overall = count > 0 ? (totalAvg / count).toFixed(2) : '4.67';
+                    const strong = subjects.filter(s => s.avg >= 4.75).map(s => s.name);
+                    const weak = subjects.filter(s => s.avg < 4.25 && s.avg > 0).map(s => s.name);
+                    summary = 'Успеваемость за 2 четверть: общий средний балл ' + overall + '. ';
+                    if (strong.length) summary += 'Сильные стороны: ' + strong.slice(0, 4).join(', ') + '. ';
+                    if (weak.length) summary += 'Рекомендуется обратить внимание на: ' + weak.join(', ') + '.';
+                    if (!summary.includes('Рекомендуется')) summary += ' Ученик показывает стабильную успеваемость.';
+                } else {
+                    const lines = data.split('\n');
+                    const students = [];
+                    lines.forEach(line => {
+                        const parts = line.split('|');
+                        if (parts.length >= 3) {
+                            const cls = parts[0].replace(/\*\*/g, '').trim();
+                            const name = parts[1].trim();
+                            const lastPart = parts[parts.length - 1].trim();
+                            const avgMatch = lastPart.match(/[\d.,]+/);
+                            if (avgMatch && !line.includes('Общий')) {
+                                students.push({ class: cls, name, avg: parseFloat(avgMatch[0].replace(',', '.')) });
+                            }
+                        }
+                    });
+                    const top = students.sort((a, b) => b.avg - a.avg).slice(0, 3);
+                    const overall = students.length ? (students.reduce((s, t) => s + t.avg, 0) / students.length).toFixed(2) : '4.74';
+                    summary = 'Сводка по сданным отчётам: ' + students.length + ' учеников, общий средний балл ' + overall + '. ';
+                    summary += 'Лучшие результаты: ' + top.map(s => s.name + ' (' + s.class + ') — ' + s.avg).join('; ') + '.';
+                }
+                resultEl.textContent = summary || 'Анализ данных завершён. Общая успеваемость в норме.';
+            }, 800);
+        }
+        
+        function handleReportUpload(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('reportFile');
+            const reportName = document.getElementById('reportName').value;
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Пожалуйста, выберите файл');
+                return;
+            }
+            
+            if (!file.name.endsWith('.xlsx')) {
+                alert('Пожалуйста, выберите файл в формате .xlsx');
+                return;
+            }
+            
+            alert('Отчет "' + reportName + '" успешно загружен!\n\nФайл: ' + file.name + '\nРазмер: ' + (file.size / 1024).toFixed(2) + ' КБ');
+            
+            document.getElementById('reportUploadForm').reset();
+            hideUploadReportForm();
+        }
+        
+        function downloadCertificate() {
+            alert('Справка будет скачана в формате PDF');
+        }
+        
+        function printCertificate() {
+            window.print();
+        }
+        
+        function toggleAnnualReport() {
+            const table = document.getElementById('annualReportTable');
+            const button = event.target;
+            
+            if (table.style.display === 'none') {
+                table.style.display = 'block';
+                button.textContent = '📋 Скрыть табель годовых оценок';
+            } else {
+                table.style.display = 'none';
+                button.textContent = '📋 Открыть табель годовых оценок';
+            }
+        }
+        
+        function showPersonalInfo(role) {
+            if (role === 'parent') {
+                document.getElementById('childProfileInfo').style.display = 'none';
+                document.getElementById('parentPersonalInfo').style.display = 'block';
+                document.querySelector('button[onclick="showPersonalInfo(\'parent\')"]').style.display = 'none';
+                document.getElementById('backToChildProfileBtn').style.display = 'inline-block';
+            } else if (role === 'admin') {
+                document.getElementById('adminProfileInfo').style.display = 'none';
+                document.getElementById('adminPersonalInfo').style.display = 'block';
+                document.getElementById('studentSelectSection').style.display = 'none';
+                document.querySelector('button[onclick="showPersonalInfo(\'admin\')"]').style.display = 'none';
+                document.getElementById('backToAdminProfileBtn').style.display = 'inline-block';
+            }
+        }
+        
+        function showChildProfile() {
+            document.getElementById('childProfileInfo').style.display = 'block';
+            document.getElementById('parentPersonalInfo').style.display = 'none';
+            document.querySelector('button[onclick="showPersonalInfo(\'parent\')"]').style.display = 'inline-block';
+            document.getElementById('backToChildProfileBtn').style.display = 'none';
+        }
+        
+        function showAdminProfile() {
+            document.getElementById('adminProfileInfo').style.display = 'block';
+            document.getElementById('adminPersonalInfo').style.display = 'none';
+            document.getElementById('studentSelectSection').style.display = 'block';
+            document.querySelector('button[onclick="showPersonalInfo(\'admin\')"]').style.display = 'inline-block';
+            document.getElementById('backToAdminProfileBtn').style.display = 'none';
+        }
+        
+        function downloadECPKey(role) {
+            if (role === 'parent') {
+                alert('Загрузка ЭЦП ключа родителя...\nФайл: ecp_key_parent_850612345.p12');
+            } else if (role === 'admin') {
+                alert('Загрузка ЭЦП ключа администратора...\nФайл: ecp_key_admin_750423678.p12');
+            }
+        }
+        
+        function showApplicationForm() {
+            document.getElementById('applicationForm').style.display = 'block';
+        }
+        
+        function hideApplicationForm() {
+            document.getElementById('applicationForm').style.display = 'none';
+        }
+        
+        function showAdminApplicationForm() {
+            document.getElementById('adminApplicationForm').style.display = 'block';
+        }
+        
+        function hideAdminApplicationForm() {
+            document.getElementById('adminApplicationForm').style.display = 'none';
+        }
+        
+        let signaturePad = null;
+        let currentSignTarget = null;
+        let sealStream = null;
+        let currentSealDataUrl = null;
+
+        function startSealWebcam() {
+            var video = document.getElementById('sealVideo');
+            if (!video) return;
+            stopSealWebcam();
+            navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false })
+                .then(function(stream) {
+                    sealStream = stream;
+                    video.srcObject = stream;
+                })
+                .catch(function(err) {
+                    console.warn('Webcam:', err);
+                    alert('Не удалось подключить веб-камеру. Проверьте доступ или используйте только подпись.');
+                });
+        }
+        function stopSealWebcam() {
+            if (sealStream) {
+                sealStream.getTracks().forEach(function(t) { t.stop(); });
+                sealStream = null;
+            }
+            var video = document.getElementById('sealVideo');
+            if (video) video.srcObject = null;
+        }
+        function captureDigitalSeal() {
+            var video = document.getElementById('sealVideo');
+            var preview = document.getElementById('sealPreview');
+            var wrap = document.getElementById('sealPreviewWrap');
+            if (!video || !preview || !wrap || !video.srcObject) {
+                alert('Сначала разрешите доступ к веб-камере и дождитесь изображения.');
+                return;
+            }
+            var size = 120;
+            var temp = document.createElement('canvas');
+            temp.width = video.videoWidth;
+            temp.height = video.videoHeight;
+            var tctx = temp.getContext('2d');
+            tctx.save();
+            tctx.translate(temp.width, 0);
+            tctx.scale(-1, 1);
+            tctx.drawImage(video, 0, 0);
+            tctx.restore();
+            var imgData = tctx.getImageData(0, 0, temp.width, temp.height);
+            var d = imgData.data;
+            for (var i = 0; i < d.length; i += 4) {
+                var r = d[i], g = d[i+1], b = d[i+2];
+                d[i]   = Math.min(255, r * 0.25 + b * 0.2);
+                d[i+1] = Math.min(255, g * 0.25 + b * 0.2);
+                d[i+2] = Math.min(255, b * 0.9 + r * 0.15 + g * 0.15);
+            }
+            tctx.putImageData(imgData, 0, 0);
+            var ctx = preview.getContext('2d');
+            preview.width = size;
+            preview.height = size;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            var scale = Math.max(size / temp.width, size / temp.height);
+            var w = temp.width * scale, h = temp.height * scale;
+            ctx.drawImage(temp, (size - w) / 2, (size - h) / 2, w, h);
+            ctx.restore();
+            ctx.strokeStyle = '#1a4d8c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = '#1a4d8c';
+            ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('IQanat Verified', size/2, size - 8);
+            currentSealDataUrl = preview.toDataURL('image/png');
+            wrap.style.display = 'block';
+        }
+
+        function showViewModal(docEl) {
+            if (!docEl) return;
+            document.getElementById('viewDocType').textContent = docEl.getAttribute('data-doc-type') || '';
+            document.getElementById('viewDocAuthor').textContent = docEl.getAttribute('data-doc-author') || '';
+            document.getElementById('viewDocDate').textContent = docEl.getAttribute('data-doc-date') || '';
+            document.getElementById('viewDocText').textContent = docEl.getAttribute('data-doc-text') || '';
+            const sig = docEl.getAttribute('data-doc-signature');
+            const block = document.getElementById('viewDocSignatureBlock');
+            const img = document.getElementById('viewDocSignatureImg');
+            if (sig) {
+                block.style.display = 'block';
+                img.src = sig;
+            } else {
+                block.style.display = 'none';
+            }
+            const seal = docEl.getAttribute('data-doc-seal');
+            const sealBlock = document.getElementById('viewDocSealBlock');
+            const sealImg = document.getElementById('viewDocSealImg');
+            if (seal && sealBlock && sealImg) {
+                sealBlock.style.display = 'block';
+                sealImg.src = seal;
+            } else if (sealBlock) {
+                sealBlock.style.display = 'none';
+            }
+            new bootstrap.Modal(document.getElementById('viewDocModal')).show();
+        }
+
+        function openSignModal(id, source) {
+            const table = document.getElementById('adminApplicationsTable');
+            const row = table ? table.querySelector(`tr[data-application-id="${id}"]`) : null;
+            if (!row) return;
+            const statusCell = row.cells[5];
+            if (statusCell && statusCell.querySelector('.badge.bg-success')) {
+                alert('Документ уже подписан');
+                return;
+            }
+            currentSignTarget = row;
+            document.getElementById('signDocType').textContent = row.getAttribute('data-doc-type') || '';
+            document.getElementById('signDocAuthor').textContent = row.getAttribute('data-doc-author') || '';
+            document.getElementById('signDocDate').textContent = row.getAttribute('data-doc-date') || '';
+            document.getElementById('signDocText').textContent = row.getAttribute('data-doc-text') || '';
+            currentSealDataUrl = null;
+            var wrap = document.getElementById('sealPreviewWrap');
+            if (wrap) wrap.style.display = 'none';
+            var modal = new bootstrap.Modal(document.getElementById('signDocModal'));
+            modal.show();
+            setTimeout(function() {
+                const canvas = document.getElementById('signaturePad');
+                if (canvas) {
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = 150;
+                    if (signaturePad) signaturePad.clear();
+                    else signaturePad = new SignaturePad(canvas, { penColor: '#000', backgroundColor: '#fff' });
+                    signaturePad.clear();
+                }
+            }, 300);
+        }
+
+        function openSignModalForCard(cardEl) {
+            currentSignTarget = cardEl;
+            currentSealDataUrl = null;
+            var wrap = document.getElementById('sealPreviewWrap');
+            if (wrap) wrap.style.display = 'none';
+            document.getElementById('signDocType').textContent = cardEl.getAttribute('data-doc-type') || '';
+            document.getElementById('signDocAuthor').textContent = cardEl.getAttribute('data-doc-author') || '';
+            document.getElementById('signDocDate').textContent = cardEl.getAttribute('data-doc-date') || '';
+            document.getElementById('signDocText').textContent = cardEl.getAttribute('data-doc-text') || '';
+            var modal = new bootstrap.Modal(document.getElementById('signDocModal'));
+            modal.show();
+            setTimeout(function() {
+                const canvas = document.getElementById('signaturePad');
+                if (canvas) {
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = 150;
+                    if (signaturePad) signaturePad.clear();
+                    else signaturePad = new SignaturePad(canvas, { penColor: '#000', backgroundColor: '#fff' });
+                    signaturePad.clear();
+                }
+            }, 300);
+        }
+
+        var captureSealBtn = document.getElementById('captureSealBtn');
+        if (captureSealBtn) captureSealBtn.addEventListener('click', captureDigitalSeal);
+
+        var signModalEl = document.getElementById('signDocModal');
+        if (signModalEl) {
+            signModalEl.addEventListener('shown.bs.modal', startSealWebcam);
+            signModalEl.addEventListener('hidden.bs.modal', stopSealWebcam);
+        }
+
+        document.getElementById('clearSignatureBtn').addEventListener('click', function() {
+            if (signaturePad) signaturePad.clear();
+        });
+
+        document.getElementById('confirmSignBtn').addEventListener('click', function() {
+            if (!signaturePad || signaturePad.isEmpty()) {
+                alert('Пожалуйста, поставьте подпись');
+                return;
+            }
+            const data = signaturePad.toDataURL('image/png');
+            if (!currentSignTarget) return;
+            currentSignTarget.setAttribute('data-doc-signature', data);
+            if (currentSealDataUrl) currentSignTarget.setAttribute('data-doc-seal', currentSealDataUrl);
+            if (currentSignTarget.tagName === 'TR') {
+                const statusCell = currentSignTarget.cells[5];
+                const actionsCell = currentSignTarget.cells[6];
+                const id = currentSignTarget.getAttribute('data-application-id');
+                if (statusCell) statusCell.innerHTML = '<span class="badge bg-success">Подписано</span>';
+                if (actionsCell) {
+                    actionsCell.innerHTML = '<button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button> <button class="btn btn-danger btn-sm" onclick="deleteApplication(' + id + ')">Удалить</button>';
+                }
+            } else {
+                const statusWrap = currentSignTarget.querySelector('p');
+                if (statusWrap && statusWrap.querySelector('.badge')) {
+                    statusWrap.innerHTML = 'Статус: <span class="badge bg-success">Подписано</span>';
+                }
+            }
+            bootstrap.Modal.getInstance(document.getElementById('signDocModal')).hide();
+            currentSignTarget = null;
+        });
+
+        document.addEventListener('click', function(e) {
+            const viewBtn = e.target.closest('.view-doc-btn');
+            if (viewBtn) {
+                e.preventDefault();
+                const card = viewBtn.closest('.app-doc');
+                if (card) showViewModal(card);
+            }
+            const viewRowBtn = e.target.closest('.view-doc-row-btn');
+            if (viewRowBtn) {
+                e.preventDefault();
+                const row = viewRowBtn.closest('tr');
+                if (row) showViewModal(row);
+            }
+            const signBtn = e.target.closest('.sign-doc-btn');
+            if (signBtn) {
+                e.preventDefault();
+                const card = signBtn.closest('.app-doc');
+                if (card) openSignModalForCard(card);
+            }
+        });
+        
+        function deleteApplication(id) {
+            if (confirm('Вы уверены, что хотите удалить это заявление? Это действие нельзя отменить.')) {
+                const table = document.getElementById('adminApplicationsTable');
+                if (table) {
+                    const row = table.querySelector(`tr[data-application-id="${id}"]`);
+                    if (row) {
+                        row.remove();
+                        alert('Заявление удалено');
+                        return;
+                    }
+                }
+                alert('Заявление #' + id + ' удалено');
+            }
+        }
+        
+        function showStudentDropdown() {
+            document.getElementById('studentDropdown').classList.add('show');
+        }
+        
+        function hideStudentDropdown() {
+            document.getElementById('studentDropdown').classList.remove('show');
+        }
+        
+        function filterStudents(searchText) {
+            const options = document.querySelectorAll('.student-option');
+            const searchLower = searchText.toLowerCase();
+            
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                if (text.includes(searchLower)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            if (searchText.length > 0) {
+                showStudentDropdown();
+            }
+        }
+        
+        function selectStudent(name, className) {
+            document.getElementById('studentSearch').value = name;
+            document.getElementById('selectedStudentName').textContent = name;
+            document.getElementById('selectedStudentClass').textContent = className;
+            document.getElementById('selectedStudentInfo').style.display = 'block';
+            
+            document.getElementById('profileStudentName').textContent = name;
+            document.getElementById('profileStudentClass').textContent = className;
+            document.getElementById('selectedStudentProfile').style.display = 'block';
+            
+            hideStudentDropdown();
+        }
+        
+        document.addEventListener('click', function(event) {
+            const container = document.querySelector('.student-select-container');
+            if (container && !container.contains(event.target)) {
+                hideStudentDropdown();
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const applicationForm = document.getElementById('newApplicationForm');
+            if (applicationForm) {
+                applicationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const type = document.getElementById('applicationType').value;
+                    const text = document.getElementById('applicationText').value;
+                    const date = document.getElementById('applicationDate').value;
+                    
+                    const typeSelect = document.getElementById('applicationType');
+                    const typeText = typeSelect.options[typeSelect.selectedIndex].text;
+                    
+                    const parentApplicationsList = document.getElementById('parentApplicationsList');
+                    if (parentApplicationsList) {
+                        const newCard = document.createElement('div');
+                        newCard.className = 'card p-3 card-doc';
+                        newCard.style.marginTop = '10px';
+                        newCard.className = 'card p-3 card-doc app-doc';
+                        newCard.setAttribute('data-doc-type', typeText);
+                        newCard.setAttribute('data-doc-author', parentApplicationsList.getAttribute('data-parent-name') || '');
+                        newCard.setAttribute('data-doc-text', text);
+                        newCard.setAttribute('data-doc-date', date);
+                        newCard.innerHTML = `
+                            <h5>${typeText}</h5>
+                            <p><strong>Текст:</strong> ${text.length > 100 ? text.substring(0, 100) + '...' : text}</p>
+                            <p>Дата: ${date}</p>
+                            <p>Статус: <span class="badge bg-warning text-dark">На подписи у Администратора</span></p>
+                            <div class="mt-2">
+                                <button class="btn btn-outline-primary btn-sm view-doc-btn">Просмотреть</button>
+                                <button class="btn btn-outline-success btn-sm sign-doc-btn">Подписать</button>
+                            </div>
+                        `;
+                        parentApplicationsList.appendChild(newCard);
+                    }
+                    
+                    const adminApplicationsTable = document.getElementById('adminApplicationsTable');
+                    if (adminApplicationsTable) {
+                        const rowCount = adminApplicationsTable.rows.length;
+                        const newRow = adminApplicationsTable.insertRow();
+                        const parentApplicationsList = document.getElementById('parentApplicationsList');
+                        const parentName = parentApplicationsList ? parentApplicationsList.getAttribute('data-parent-name') || 'Родитель' : 'Родитель';
+                        const newId = Date.now(); 
+                        newRow.setAttribute('data-application-id', newId);
+                        newRow.setAttribute('data-doc-type', typeText);
+                        newRow.setAttribute('data-doc-author', parentName + ' (Родитель)');
+                        newRow.setAttribute('data-doc-text', text);
+                        newRow.setAttribute('data-doc-date', date);
+                        newRow.className = 'app-doc';
+                        newRow.innerHTML = `
+                            <td>${rowCount + 1}</td>
+                            <td>${parentName} (Родитель)</td>
+                            <td>${typeText}</td>
+                            <td>${text.length > 50 ? text.substring(0, 50) + '...' : text}</td>
+                            <td>${date}</td>
+                            <td><span class="badge bg-warning text-dark">На подписи</span></td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                <button class="btn btn-success btn-sm" onclick="openSignModal(${newId}, 'admin')">Подписать</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteApplication(${newId})">Удалить</button>
+                            </td>
+                        `;
+                    }
+                    
+                    alert('Заявление отправлено на рассмотрение!\nТип: ' + typeText + '\nДата: ' + date);
+                    
+                    applicationForm.reset();
+                    hideApplicationForm();
+                });
+            }
+            
+            const adminApplicationForm = document.getElementById('newAdminApplicationForm');
+            if (adminApplicationForm) {
+                adminApplicationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const type = document.getElementById('adminApplicationType').value;
+                    const text = document.getElementById('adminApplicationText').value;
+                    const date = document.getElementById('adminApplicationDate').value;
+                    
+                    const typeSelect = document.getElementById('adminApplicationType');
+                    const typeText = typeSelect.options[typeSelect.selectedIndex].text;
+                    
+                    const adminApplicationsTable = document.getElementById('adminApplicationsTable');
+                    if (adminApplicationsTable) {
+                        const rowCount = adminApplicationsTable.rows.length;
+                        const newRow = adminApplicationsTable.insertRow();
+                        const newId = Date.now();       
+                        newRow.setAttribute('data-application-id', newId);
+                        newRow.setAttribute('data-doc-type', typeText);
+                        newRow.setAttribute('data-doc-author', 'Школа (Администратор)');
+                        newRow.setAttribute('data-doc-text', text);
+                        newRow.setAttribute('data-doc-date', date);
+                        newRow.className = 'app-doc';
+                        newRow.innerHTML = `
+                            <td>${rowCount + 1}</td>
+                            <td>Школа (Администратор)</td>
+                            <td>${typeText}</td>
+                            <td>${text.length > 50 ? text.substring(0, 50) + '...' : text}</td>
+                            <td>${date}</td>
+                            <td><span class="badge bg-success">Подписано</span></td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm view-doc-row-btn">Просмотреть</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteApplication(${newId})">Удалить</button>
+                            </td>
+                        `;
+                    }
+                    
+                    alert('Заявление от имени школы создано!\nТип: ' + typeText + '\nДата: ' + date);
+                    
+                    adminApplicationForm.reset();
+                    hideAdminApplicationForm();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
